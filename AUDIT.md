@@ -109,13 +109,29 @@ amount of static review had caught. Each is fixed, with a regression test.
 | Supabase JWT: 60s default expiry leeway | Wider acceptance window than needed | Narrowed to 5s, configurable; optional issuer pinning added |
 | `act-ai-server` accepted whitespace-only input | A blank topic reached the provider and billed a paid call for nothing | `isNonEmptyString` guard on topic, script, and title |
 | `act-e2e` scoped npm scripts passed a bare directory to `node --test` | Node 22 resolves it as a module path; every scoped script failed with `MODULE_NOT_FOUND` | Glob patterns |
+| `act-ai-server` shutdown was unbounded | `fastify.close()` waits for connections to go idle; a client that never reads its response body kept one active forever, so the pod hung until SIGKILL and stalled every rolling update | Grace period (`SHUTDOWN_GRACE_MS`, default 10s) after which the process exits anyway, and logs that it did |
 
 The suite is verified to *detect* regressions, not merely to pass: run against a
 server trusting a different JWT secret, exactly the four "accepts a valid token"
 tests fail while all fourteen rejection tests still pass.
 
-Coverage now stands at **345 tests across 84 suites**, including a
-`contracts/manifests` suite that parses the act-infra manifests and checks
+Coverage now stands at **411 tests across 99 suites**. Three categories exist
+because the behaviour they cover is invisible to a suite that only talks to a
+running deployment:
+
+- **`lifecycle/`** starts services on ephemeral ports with a chosen environment,
+  which is the only way to observe graceful shutdown, fail-soft startup against
+  a dead dependency, and fail-closed auth when no secret is configured.
+- **`database/`** applies the sea-orm migrations to a throwaway Postgres —
+  schema shape, constraints, idempotent re-runs, reversible `down`. It is also
+  the only exercise anywhere of the service's database connection path; every
+  other suite runs with `database_connected: false`.
+- **`journeys/`** proves the api-server *itself* consumes the events it
+  subscribes to, using its own log as evidence. The NATS suites only show the
+  broker delivers to a subscriber we control, which would still pass if the
+  service were subscribed to the wrong subject.
+
+Plus **`contracts/manifests`**, which parses the act-infra manifests and checks
 probes, resource limits, `securityContext`, secret injection, and port agreement
 against the running services — drift that nothing else in the build catches.
 
