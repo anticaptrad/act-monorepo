@@ -95,10 +95,32 @@ in, then moved the duplicates out of the workspace (no `rm`, per `agents.md`).
 | act-infra | `kubectl apply --dry-run=client` | ✅ (4 manifests) |
 | act-e2e | `node --test` discovery + syntax | ✅ (13 tests discovered) |
 
-## 4. Follow-ups (not done)
+## 4. Second pass — defects found by end-to-end testing
 
-- Changes are left **uncommitted** in each repo's working tree for review — no
-  commits/pushes were made.
+Standing the services up locally against real dependencies (a NATS broker, a
+Selenium Grid, a Playwright server, a CDP Chromium) surfaced defects that no
+amount of static review had caught. Each is fixed, with a regression test.
+
+| Defect | Impact | Fix |
+| --- | --- | --- |
+| `act-ai-server` constructed every LLM client at module load | A single missing API key aborted startup. The k8s `secretRef` is optional, so an unconfigured provider is expected — the pod would have crash-looped and taken the credential-free probes down with it. | Lazy per-provider construction; a missing key is now a 503 on that one route naming the variable |
+| Supabase JWT: `nbf` unvalidated | `jsonwebtoken` leaves `validate_nbf` off, so a not-yet-valid token authenticated | `validate_nbf = true` |
+| Supabase JWT: missing `aud` skipped audience matching | A token minted for another service authenticated here | `aud` is a required claim; its absence fails verification |
+| Supabase JWT: 60s default expiry leeway | Wider acceptance window than needed | Narrowed to 5s, configurable; optional issuer pinning added |
+| `act-ai-server` accepted whitespace-only input | A blank topic reached the provider and billed a paid call for nothing | `isNonEmptyString` guard on topic, script, and title |
+| `act-e2e` scoped npm scripts passed a bare directory to `node --test` | Node 22 resolves it as a module path; every scoped script failed with `MODULE_NOT_FOUND` | Glob patterns |
+
+The suite is verified to *detect* regressions, not merely to pass: run against a
+server trusting a different JWT secret, exactly the four "accepts a valid token"
+tests fail while all fourteen rejection tests still pass.
+
+Coverage now stands at **345 tests across 84 suites**, including a
+`contracts/manifests` suite that parses the act-infra manifests and checks
+probes, resource limits, `securityContext`, secret injection, and port agreement
+against the running services — drift that nothing else in the build catches.
+
+## 5. Follow-ups (not done)
+
 - Confirm the real in-cluster service names for NATS, the OTel collector, and the
   browser services; the manifests/tests use conventional defaults.
 - Provide the `act-<svc>-secrets` Secrets via the fiducia operator.
