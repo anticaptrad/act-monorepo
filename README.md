@@ -28,4 +28,6 @@ Every repo carries an `agents.md` with the platform rules, mirrored into
 - Blacklisted operations: `git reset`, `rm` (except scratch), `git filter-repo`, `git clean`.
 - Blacklisted dependency: `dotenv` (config comes from the environment / k8s).
 
-See [AUDIT.md](AUDIT.md) for the consolidation + hardening changelog.
+See [docs/architecture.md](docs/architecture.md) for the platform architecture and
+operational contract, and [AUDIT.md](AUDIT.md) for the consolidation + hardening
+changelog.
