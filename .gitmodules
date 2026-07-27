@@ -1,0 +1,4 @@
+[submodule "apps/act-mcp-server.rs"]
+	path = apps/act-mcp-server.rs
+	url = git@github.com:anticaptrad/act-mcp-server.rs.git
+	branch = main
