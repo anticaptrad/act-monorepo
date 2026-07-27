@@ -44,7 +44,7 @@ jobs:
                 test "$(git ls-files --stage -- "$value" | awk 'NR == 1 {print $1}')" = "160000"
                 ;;
               *.url)
-                [[ "$value" =~ ^git@github\.com:anticaptrad/[A-Za-z0-9._-]+(?:\.git)?$ ]]
+                [[ "$value" =~ ^git@github\.com:anticaptrad/[A-Za-z0-9._-]+(\.git)?$ ]]
                 ;;
               *.branch)
                 test "$value" = "main"
