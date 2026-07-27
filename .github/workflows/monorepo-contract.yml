@@ -1,0 +1,58 @@
+name: monorepo-contract
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Validate workflow
+        uses: docker://rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+        with:
+          args: .github/workflows/monorepo-contract.yml
+      - name: Validate MCP submodule contract
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -f .gitmodules
+          test "$(git config -f .gitmodules --get submodule.apps/act-mcp-server.rs.path)" = "apps/act-mcp-server.rs"
+          test "$(git config -f .gitmodules --get submodule.apps/act-mcp-server.rs.url)" = "git@github.com:anticaptrad/act-mcp-server.rs.git"
+          test "$(git config -f .gitmodules --get submodule.apps/act-mcp-server.rs.branch)" = "main"
+          test "$(git ls-files --stage -- apps/act-mcp-server.rs | awk 'NR == 1 {print $1}')" = "160000"
+          grep -qF '`act-mcp-server.rs`' README.md
+
+          while IFS=' ' read -r key value; do
+            case "$key" in
+              *.path)
+                [[ "$value" == apps/* ]]
+                test "$(git ls-files --stage -- "$value" | awk 'NR == 1 {print $1}')" = "160000"
+                ;;
+              *.url)
+                [[ "$value" =~ ^git@github\.com:anticaptrad/[A-Za-z0-9._-]+(?:\.git)?$ ]]
+                ;;
+              *.branch)
+                test "$value" = "main"
+                ;;
+            esac
+          done < <(git config -f .gitmodules --get-regexp '^submodule\.')
+
+          if git grep -n -E '^(<<<<<<<|=======|>>>>>>>)' -- . ':(exclude)*.lock'; then
+            echo 'Git conflict markers found' >&2
+            exit 1
+          fi
