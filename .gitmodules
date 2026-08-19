@@ -1,4 +1,32 @@
 [submodule "apps/act-mcp-server.rs"]
 	path = apps/act-mcp-server.rs
-	url = git@github.com:anticaptrad/act-mcp-server.rs.git
+	url = https://github.com/anticaptrad/act-mcp-server.rs.git
+	branch = main
+[submodule "apps/act-api-server.rs"]
+	path = apps/act-api-server.rs
+	url = https://github.com/anticaptrad/act-api-server.rs.git
+	branch = main
+[submodule "apps/act-web-server.rs"]
+	path = apps/act-web-server.rs
+	url = https://github.com/anticaptrad/act-web-server.rs.git
+	branch = main
+[submodule "apps/act-ai-server.ts"]
+	path = apps/act-ai-server.ts
+	url = https://github.com/anticaptrad/act-ai-server.ts.git
+	branch = main
+[submodule "packages/act-interfaces"]
+	path = packages/act-interfaces
+	url = https://github.com/anticaptrad/act-interfaces.git
+	branch = main
+[submodule "packages/act-clients"]
+	path = packages/act-clients
+	url = https://github.com/anticaptrad/act-clients.git
+	branch = main
+[submodule "tests/act-e2e"]
+	path = tests/act-e2e
+	url = https://github.com/anticaptrad/act-e2e.git
+	branch = main
+[submodule "tools/act-sync"]
+	path = tools/act-sync
+	url = https://github.com/anticaptrad/act-sync.git
 	branch = main
