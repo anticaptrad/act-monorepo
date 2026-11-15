@@ -4,6 +4,7 @@ on:
     paths:
       - 'docs/atto-candidate-promotion.v1.json'
       - 'scripts/test-atto-promotion.mjs'
+      - 'scripts/test_atto_promotion.rs'
       - '.gitmodules'
       - 'packages/act-clients'
       - 'packages/act-interfaces'
@@ -13,6 +14,7 @@ on:
     paths:
       - 'docs/atto-candidate-promotion.v1.json'
       - 'scripts/test-atto-promotion.mjs'
+      - 'scripts/test_atto_promotion.rs'
       - '.gitmodules'
       - 'packages/act-clients'
       - 'packages/act-interfaces'
@@ -27,7 +29,10 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      - uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30
         with:
-          node-version: '22'
-      - run: node --test scripts/test-atto-promotion.mjs
+          toolchain: stable
+      - name: Verify candidate and gitlink policy with Rust
+        run: |
+          rustc --edition=2021 --test scripts/test_atto_promotion.rs -o "$RUNNER_TEMP/atto-promotion-tests"
+          "$RUNNER_TEMP/atto-promotion-tests"
