@@ -11,11 +11,11 @@ const approvedPins = {
   "packages/act-interfaces": "611828bcd6ceee863914854805d252e8ecbf871a"
 };
 function committedGitlink(path) {
-  const result = execFileSync("git", ["ls-tree", "HEAD", "--", path], {encoding:"utf8"}).trim();
-  const match = result.match(/^160000 commit ([a-f0-9]{40})\\t/);
-  return match?.[1] ?? null;
+  const result = execFileSync("git", ["ls-tree", "HEAD", "--", path], { encoding: "utf8" }).trim();
+  const fields = result.split(/\s+/);
+  return fields[0] === "160000" && fields[1] === "commit" && /^[a-f0-9]{40}$/.test(fields[2] ?? "")
+    ? fields[2] : null;
 }
-
 
 function candidateErrors(p) {
   const errors = [];
