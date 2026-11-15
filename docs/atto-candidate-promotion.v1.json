@@ -1,0 +1,20 @@
+{
+  "schema": "anticaptrad.atto-candidate-promotion/v1",
+  "status": "candidate",
+  "allowDeploy": false,
+  "allowSdkPublish": false,
+  "requireExecutableCompilerReceipt": true,
+  "requirePeerSchemaParity": true,
+  "authoritativeRepositories": [
+    "anticaptrad/act-interfaces",
+    "anticaptrad/act-clients"
+  ],
+  "candidatePullRequests": [
+    "https://github.com/anticaptrad/act-interfaces/pull/18",
+    "https://github.com/anticaptrad/act-clients/pull/26"
+  ],
+  "approvedAggregatePins": {
+    "packages/act-clients": "149b1af3be7447f2babf3fbcc1e45289f0d492b7",
+    "packages/act-interfaces": "611828bcd6ceee863914854805d252e8ecbf871a"
+  }
+}

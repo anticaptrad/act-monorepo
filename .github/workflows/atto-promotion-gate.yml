@@ -1,0 +1,38 @@
+name: AttoLang candidate aggregate gate
+on:
+  pull_request:
+    paths:
+      - 'docs/atto-candidate-promotion.v1.json'
+      - 'scripts/test-atto-promotion.mjs'
+      - 'scripts/test_atto_promotion.rs'
+      - '.gitmodules'
+      - 'packages/act-clients'
+      - 'packages/act-interfaces'
+      - '.github/workflows/atto-promotion-gate.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/atto-candidate-promotion.v1.json'
+      - 'scripts/test-atto-promotion.mjs'
+      - 'scripts/test_atto_promotion.rs'
+      - '.gitmodules'
+      - 'packages/act-clients'
+      - 'packages/act-interfaces'
+      - '.github/workflows/atto-promotion-gate.yml'
+permissions:
+  contents: read
+jobs:
+  atto-aggregate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30
+        with:
+          toolchain: stable
+      - name: Verify candidate and gitlink policy with Rust
+        run: |
+          rustc --edition=2021 --test scripts/test_atto_promotion.rs -o "$RUNNER_TEMP/atto-promotion-tests"
+          "$RUNNER_TEMP/atto-promotion-tests"
