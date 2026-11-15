@@ -10,6 +10,6 @@ candidate head for aggregate release. Advancing a gitlink requires approved
 upstream PRs, executable compiler receipts, schema peer-authority parity and
 a separate aggregate pin review.
 
-Run `node --test scripts/test-atto-promotion.mjs`. The guard checks a
+Run `rustc --edition=2021 --test scripts/test_atto_promotion.rs -o /tmp/atto-promotion-tests && /tmp/atto-promotion-tests`. The guard checks a
 repository-local policy snapshot, not live upstream PR state or a compiler
 artifact. It must not be used as a substitute for those checks.
