@@ -5,6 +5,8 @@ on:
       - 'docs/atto-candidate-promotion.v1.json'
       - 'scripts/test-atto-promotion.mjs'
       - '.gitmodules'
+      - 'packages/act-clients'
+      - 'packages/act-interfaces'
       - '.github/workflows/atto-promotion-gate.yml'
   push:
     branches: [main]
@@ -12,6 +14,8 @@ on:
       - 'docs/atto-candidate-promotion.v1.json'
       - 'scripts/test-atto-promotion.mjs'
       - '.gitmodules'
+      - 'packages/act-clients'
+      - 'packages/act-interfaces'
       - '.github/workflows/atto-promotion-gate.yml'
 permissions:
   contents: read
